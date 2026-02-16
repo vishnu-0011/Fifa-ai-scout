@@ -1,56 +1,99 @@
-# FIFA AI Scout
+# ⚽ FIFA AI Tactical Scout Agent
 
-FIFA AI Scout is an interactive Streamlit application backed by an Ollama-powered assistant that helps analysts compare transfer targets against their current squad context. The workflow ingests FIFA player data, normalizes the schema, and feeds curated player snapshots to the `ScoutAgent`, which returns natural-language scouting briefs.
+FIFA AI Tactical Scout is an **agentic** scouting system that goes beyond simple stat filtering. By leveraging **Qwen3:4b via Ollama**, it performs **Gap Analysis**—comparing a target player's growth trajectory and technical attributes against your team’s specific tactical weaknesses to produce a data-backed scouting verdict.
 
-## Tech Stack
+## 🚀 Key Features
 
-- Python 3.10+
-- Streamlit for the UI layer
-- Pandas for data engineering
-- Ollama (running `qwen3:4b` by default) for tactical write-ups
+- **Dynamic Player Search**: Instantly access and analyze any player from the FIFA dataset.
+- **Gap Analysis Agent**: Describe your team weakness (e.g., “slow transition in midfield”), and the agent evaluates how a candidate specifically addresses that gap.
+- **Growth Trajectory**: Computes the delta between current rating and potential to identify **high-velocity** prospects.
+- **Local Inference**: Runs entirely on your machine (optimized for entry-level GPUs; tested on NVIDIA GTX 1650).
 
-## Dataset
+## 🛠️ Technical Stack
 
-Player data comes from the [FIFA Player Performance and Market Value Analytics](https://www.kaggle.com/datasets/jayjoshi37/fifa-player-performance-and-market-value-analytics/code) dataset on Kaggle. Drop the CSV into `data/raw/fifa_player_performance_market_value.csv`; the engine auto-detects column aliases (e.g., `overall_rating`, `player_name`) and synthesizes missing metric columns so different FIFA exports work out of the box.
+- **Brain**: Qwen3:4b (via Ollama)
+- **Data Engine**: Pandas (preprocessing, currency conversion, growth metrics)
+- **Frontend**: Streamlit
+- **Backend**: Python
 
-## Features
+## 📊 Dataset
 
-- Player picker with cached dataset loading for snappy UX
-- Optional squad baseline selector that averages chosen teammates to highlight gaps
-- `ScoutAgent` prompt engineering that drives consistent tactical verdicts plus match-impact scoring
-- Normalized currency and rating fields, plus computed `potential_gap` metric for upside sorting
+This project uses the Kaggle dataset: **FIFA Player Performance and Market Value Analytics**.
 
-## Project Structure
+- Source: https://www.kaggle.com/datasets/jayjoshi37/fifa-player-performance-and-market-value-analytics
+- Place the CSV at: `data/raw/fifa_player_performance_market_value.csv`
 
-- `main.py` – Streamlit surface that wires the engine and agent together
-- `src/data_engine.py` – Data ingestion, cleansing, caching, and `PlayerSnapshot` creation
-- `src/scout_agent.py` – Ollama client + structured prompt builder
-- `src/utils.py` – Reserved for shared helpers (currently empty)
-- `data/` – Raw (tracked) and processed (gitignored) datasets
-- `models/` – Space for exported weights or checkpoints (gitignored)
-- `notebook/` – Exploratory notebooks
+## 📂 Project Structure
 
-## Setup
+```text
+fifa-ai-scout/
+├── data/
+│   ├── raw/                # Kaggle FIFA Dataset
+│   └── processed/          # Cached/processed outputs
+├── src/
+│   ├── data_engine.py      # Data cleaning & stat logic
+│   ├── scout_agent.py      # LLM orchestration & prompts
+│   └── utils.py            # Shared helpers
+├── main.py                 # Streamlit UI & orchestration
+├── requirements.txt        # Project dependencies
+└── notebook/               # Exploration notebooks
+```
 
-1. Clone the repository and move into it.
-2. Create a virtual environment (examples: `python -m venv .venv` or `py -3 -m venv fifa`).
-3. Activate the env and install dependencies: `pip install -r requirements.txt`.
-4. Install Ollama locally and pull the default model: `ollama pull qwen3:4b`.
-5. Download the Kaggle CSV and place it at `data/raw/fifa_player_performance_market_value.csv`.
+## ⚙️ Installation & Setup
 
-## Running the App
+### 1) Clone the repo
+
+```bash
+git clone https://github.com/vishnu-0011/Fifa-ai-scout.git
+cd Fifa-ai-scout
+```
+
+### 2) Set up a virtual environment
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+- **Windows (PowerShell)**: `venv\Scripts\Activate.ps1`
+- **Windows (cmd)**: `venv\Scripts\activate.bat`
+- **macOS/Linux**: `source venv/bin/activate`
+
+Then install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3) Pull the AI model
+
+Ensure Ollama is installed and running, then:
+
+```bash
+ollama pull qwen3:4b
+```
+
+### 4) Add the dataset
+
+Download the Kaggle CSV and place it here:
+
+`data/raw/fifa_player_performance_market_value.csv`
+
+## ▶️ Run the application
 
 ```bash
 streamlit run main.py
 ```
 
-The first run caches the `FIFAEngine` and the `ScoutAgent`. Use the sidebar to describe your team weakness and optionally select current-squad players to build the baseline. Press **Generate Scouting Report** to trigger the agent call.
+## 🧠 Why Qwen3:4b?
 
-## Troubleshooting
+This project is optimized for local performance on consumer hardware. **Qwen3:4b** provides strong reasoning for its size, enabling tactical scouting reports without overwhelming a **4GB VRAM** GPU like the GTX 1650.
 
-- **Missing columns**: Ensure the CSV headers match the Kaggle export. The engine auto-maps common aliases, but `overall_rating` (or `overall`) must exist.
-- **Ollama import error**: Install the Python client with `pip install ollama` and confirm the Ollama daemon is running.
-- **Streamlit cannot start**: Verify the virtual environment is activated when installing dependencies and launching the app.
+## 🧩 Notes / Troubleshooting
+
+- If you get Ollama connection errors, confirm the Ollama service is running and that `ollama run qwen3:4b` works in a terminal.
+- If Streamlit fails to start, ensure your virtual environment is activated before running `streamlit run main.py`.
 
 ## License
 
